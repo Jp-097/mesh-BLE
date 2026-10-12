@@ -3,6 +3,7 @@
 #include "core/MessageBus.h"
 #include <esp_now.h>
 #include <WiFi.h>
+#include <esp_wifi.h>
 
 // ─── Estructura de paquete ───────────────────────────────────
 struct MeshPacket {
@@ -106,6 +107,11 @@ void MeshNode::sendHello() {
 void MeshNode::init() {
     WiFi.mode(WIFI_STA);
     WiFi.disconnect();
+
+        // Forzar canal 1 (trick: promiscuous on → set channel → promiscuous off)
+    esp_wifi_set_promiscuous(true);
+    esp_wifi_set_channel(1, WIFI_SECOND_CHAN_NONE);
+    esp_wifi_set_promiscuous(false);
 
     Serial.println("Nodo Universal v2 (auto-discovery)");
     Serial.printf("NodeID: %lu\n", (uint32_t)ESP.getEfuseMac());
